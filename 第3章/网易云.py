@@ -3,6 +3,7 @@
 # params = encText, encSeckey = encSeckey
 # "rid=R_SO_4_254260&threadId=R_SO_4_254260&pageNo=1&pageSize=20&cursor=-1&offset=0&orderType=1"
 # pip install pycrypto
+import csv
 
 from Crypto.Cipher import AES
 from base64 import b64encode
@@ -103,4 +104,82 @@ resp = requests.post(url, data={
     "encSecKey": get_encSecKey()
 })
 
-print(resp.text)
+# print(resp.json())
+
+f = open(f"孤单北半球.csv", mode="w", encoding='utf-8')
+csvwriter = csv.writer(f)
+
+comments = resp.json()["data"]["comments"]  # 获取每个的评论记录
+for comment in comments:
+    user = comment['user']  # 用户记录
+    userId = user['userId'] # 用户Id
+    nickname = user['nickname']  # 用户昵称
+    avatarUrl = user['avatarUrl']
+    content = comment['content']  # 获取评论内容
+    beReplied_comment = comment['beReplied']  # 是否是追评，是的话值为原评论人的信息，否为None
+    csvwriter.writerow([userId, nickname, content])
+    if beReplied_comment is not None:
+        beReplied_user = beReplied_comment[0]['user']
+        beReplied_userId = beReplied_user['userId'] # 用户Id
+        beReplied_nickname = beReplied_user['nickname']  # 用户昵称
+        beReplied_avatarUrl = beReplied_user['avatarUrl']
+        beReplied_content = beReplied_comment[0]['content'] # 获取评论内容
+        csvwriter.writerow([beReplied_userId,beReplied_nickname,beReplied_content])
+
+print('over!')
+
+# {'code': 200, 'data': {'comments': [{'user': {'avatarDetail': None, 'commonIdentity': None, 'locationInfo': None,
+#                                               'liveInfo': None, 'followed': False, 'vipRights': None,
+#                                               'relationTag': None, 'anonym': 0, 'userId': 1442636111, 'userType': 0,
+#                                               'nickname': '满满牌芋泥奶露',
+#                                               'avatarUrl': 'https://p1.music.126.net/hOv7Cha-lv10RKzopJEEjg==/109951165966910895.jpg',
+#                                               'authStatus': 0, 'expertTags': None, 'experts': None, 'vipType': 0,
+#                                               'remarkName': None, 'isHug': False}, 'beReplied': [{'user': {
+#     'avatarDetail': None, 'commonIdentity': None, 'locationInfo': None, 'liveInfo': None, 'followed': False,
+#     'vipRights': None, 'relationTag': None, 'anonym': 0, 'userId': 19712407, 'userType': 0, 'nickname': '小撸猫',
+#     'avatarUrl': 'https://p1.music.126.net/73vbfT3clBs_sPT2ZEAZZw==/3242459790535318.jpg', 'authStatus': 0,
+#     'expertTags': None, 'experts': None, 'vipType': 0, 'remarkName': None, 'isHug': False},
+#                                                                                                   'beRepliedCommentId': 13040982,
+#                                                                                                   'content': '这歌是Flash流行的年代，听到这歌有一种想哭的感觉。',
+#                                                                                                   'status': 0,
+#                                                                                                   'expressionUrl': None}],
+#                                      'commentId': 5325303608, 'content': '15年的评论了……', 'status': 0,
+#                                      'time': 1622915906183, 'likedCount': 0, 'liked': False, 'expressionUrl': None,
+#                                      'parentCommentId': 13040982, 'repliedMark': False, 'pendantData': None,
+#                                      'showFloorComment': {'replyCount': 0, 'comments': None, 'showReplyCount': False,
+#                                                           'topCommentIds': None, 'target': None},
+#                                      'decoration': {'repliedByAuthorCount': 0}, 'commentLocationType': 0, 'args': None,
+#                                      'tag': {'datas': None, 'relatedCommentIds': None}, 'source': None, 'extInfo': {},
+#                                      'commentVideoVO': None}, {
+#                                         'user': {'avatarDetail': None, 'commonIdentity': None, 'locationInfo': None,
+#                                                  'liveInfo': None, 'followed': False, 'vipRights': None,
+#                                                  'relationTag': None, 'anonym': 0, 'userId': 4004694072, 'userType': 0,
+#                                                  'nickname': '未来可期_bfZR',
+#                                                  'avatarUrl': 'https://p1.music.126.net/76eNFFlmIMyUxIaLV9MUKA==/109951166045189211.jpg',
+#                                                  'authStatus': 0, 'expertTags': None, 'experts': None, 'vipType': 0,
+#                                                  'remarkName': None, 'isHug': False}, 'beReplied': [{'user': {
+#         'avatarDetail': None, 'commonIdentity': None, 'locationInfo': None, 'liveInfo': None, 'followed': False,
+#         'vipRights': None, 'relationTag': None, 'anonym': 0, 'userId': 1946268782, 'userType': 0, 'nickname': '也许是珊瑚',
+#         'avatarUrl': 'https://p1.music.126.net/a-J7F7kCZF0zjSEJTi0n4Q==/109951165117263384.jpg', 'authStatus': 0,
+#         'expertTags': None, 'experts': None, 'vipType': 0, 'remarkName': None, 'isHug': False},
+#                                                                                                      'beRepliedCommentId': 5269845737,
+#                                                                                                      'content': '异地恋真的好辛苦',
+#                                                                                                      'status': 0,
+#                                                                                                      'expressionUrl': None}],
+#                                         'commentId': 5324071878, 'content': '异国恋呢？', 'status': 0, 'time': 1622774146802,
+#                                         'likedCount': 0, 'liked': False, 'expressionUrl': None,
+#                                         'parentCommentId': 5269845737, 'repliedMark': False, 'pendantData': None,
+#                                         'showFloorComment': {'replyCount': 0, 'comments': None, 'showReplyCount': False,
+#                                                              'topCommentIds': None, 'target': None},
+#                                         'decoration': {'repliedByAuthorCount': 0}, 'commentLocationType': 0,
+#                                         'args': None, 'tag': {'datas': None, 'relatedCommentIds': None}, 'source': None,
+#                                         'extInfo': {}, 'commentVideoVO': None}, {
+#                                         'user': {'avatarDetail': None, 'commonIdentity': None, 'locationInfo': None,
+#                                                  'liveInfo': None, 'followed': False, 'vipRights': None,
+#                                                  'relationTag': None, 'anonym': 0, 'userId': 4004694072, 'userType': 0,
+#                                                  'nickname': '未来可期_bfZR',
+#                                                  'avatarUrl': 'https://p1.music.126.net/76eNFFlmIMyUxIaLV9MUKA==/109951166045189211.jpg',
+#                                                  'authStatus': 0, 'expertTags': None, 'experts': None, 'vipType': 0,
+#                                                  'remarkName': None, 'isHug': False}, 'beReplied': [{'user': {
+#         'avatarDetail': None, 'commonIdentity': None, 'locationInfo': None, 'liveInfo': None, 'followed': False,
+#         'vipRights': None, 'relationTag': None, 'anonym': 0, 'userId': 4890405952, 'userType': 0,
